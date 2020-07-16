@@ -59,7 +59,7 @@ private:
     bool _active_high;
     DigitalOut _pwr; //power on/off key pin
     DigitalOut _rst; //reset pin
-    DigitalOut _spl; //power supply enable pin
+    DigitalOut _supply; //power supply enable pin
 
 };
 } // namespace mbed

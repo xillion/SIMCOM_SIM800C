@@ -46,24 +46,24 @@ SIMCOM_SIM800C::SIMCOM_SIM800C(FileHandle *fh, PinName pwr, bool active_high, Pi
     _active_high(active_high),
     _pwr(pwr, !_active_high),
     _rst(rst, !_active_high),
-    _spl(spl, !_active_high)
+    _supply(spl, !_active_high)
 {
     AT_CellularBase::set_cellular_properties(cellular_properties);
 }
 
 nsapi_error_t SIMCOM_SIM800C::hard_power_on(){
 
-    if(_spl.is_connected())
+    if(_supply.is_connected())
     {
         tr_info("SIM800C::hard_power_on");
-        if(_spl.read())
+        if(_supply.read())
         {
             tr_info("Power suplly of SIM800C was already enabled");
             return NSAPI_ERROR_OK;
         }
         else
         {
-            _spl.write(!_active_high);
+            _supply.write(!_active_high);
             tr_info("Power suplly of SIM800C has been enabled");
             return NSAPI_ERROR_OK;
         }
@@ -74,12 +74,12 @@ nsapi_error_t SIMCOM_SIM800C::hard_power_on(){
 
 nsapi_error_t SIMCOM_SIM800C::hard_power_off(){
 
-    if(_spl.is_connected())
+    if(_supply.is_connected())
     {
         tr_info("SIM800C::hard_power_off");
-        if(_spl.read())
+        if(_supply.read())
         {
-            _spl.write(_active_high);
+            _supply.write(_active_high);
             tr_info("Power suplly of SIM800C has been disabled");
             return NSAPI_ERROR_OK;
         }
