@@ -23,22 +23,27 @@
 using namespace mbed;
 
 // by default all properties are supported
-static const intptr_t cellular_properties[AT_CellularBase::PROPERTY_MAX] = {
+static const intptr_t cellular_properties[AT_CellularDevice::PROPERTY_MAX] = {
     AT_CellularNetwork::RegistrationModeLAC,    // C_EREG AT_CellularNetwork::RegistrationMode. What support modem has for this registration type.
     AT_CellularNetwork::RegistrationModeLAC,    // C_GREG AT_CellularNetwork::RegistrationMode. What support modem has for this registration type. 
     AT_CellularNetwork::RegistrationModeLAC,    // C_REG  AT_CellularNetwork::RegistrationMode. What support modem has for this registration type.
-    1,   // AT_CGSN_WITH_TYPE        0 = not supported, 1 = supported. AT+CGSN without type is likely always supported similar to AT+GSN. 
-    1,   // AT_CGDATA                0 = not supported, 1 = supported. Alternative is to support only ATD*99***<cid>#
-    0,   // AT_CGAUTH                0 = not supported, 1 = supported. APN authentication AT commands supported
-    1,   // AT_CNMI                  0 = not supported, 1 = supported. New message (SMS) indication AT command
-    1,   // AT_CSMP                  0 = not supported, 1 = supported. Set text mode AT command
-    1,   // AT_CMGF                  0 = not supported, 1 = supported. Set preferred message format AT command
-    1,   // AT_CSDH                  0 = not supported, 1 = supported. Show text mode AT command
-    1,   // PROPERTY_IPV4_STACK      0 = not supported, 1 = supported. Does modem support IPV4?
-    0,   // PROPERTY_IPV6_STACK      0 = not supported, 1 = supported. Does modem support IPV6?
-    0,   // PROPERTY_IPV4V6_STACK    0 = not supported, 1 = supported. Does modem support IPV4 and IPV6 simultaneously?
-    0,   // PROPERTY_NON_IP_PDP_TYPE 0 = not supported, 1 = supported. Does modem support Non-IP?
-    1,   // PROPERTY_AT_CGEREP       0 = not supported, 1 = supported. Does modem support AT command AT+CGEREP.
+    1,   // AT_CGSN_WITH_TYPE                 0 = not supported, 1 = supported. AT+CGSN without type is likely always supported similar to AT+GSN. 
+    1,   // AT_CGDATA                         0 = not supported, 1 = supported. Alternative is to support only ATD*99***<cid>#
+    0,   // AT_CGAUTH                         0 = not supported, 1 = supported. APN authentication AT commands supported
+    1,   // AT_CNMI                           0 = not supported, 1 = supported. New message (SMS) indication AT command
+    1,   // AT_CSMP                           0 = not supported, 1 = supported. Set text mode AT command
+    1,   // AT_CMGF                           0 = not supported, 1 = supported. Set preferred message format AT command
+    1,   // AT_CSDH                           0 = not supported, 1 = supported. Show text mode AT command
+    1,   // PROPERTY_IPV4_STACK               0 = not supported, 1 = supported. Does modem support IPV4?
+    0,   // PROPERTY_IPV6_STACK               0 = not supported, 1 = supported. Does modem support IPV6?
+    0,   // PROPERTY_IPV4V6_STACK             0 = not supported, 1 = supported. Does modem support IPV4 and IPV6 simultaneously?
+    0,   // PROPERTY_NON_IP_PDP_TYPE          0 = not supported, 1 = supported. Does modem support Non-IP?
+    1,   // PROPERTY_AT_CGEREP                0 = not supported, 1 = supported. Does modem support AT command AT+CGEREP.
+    1,   // PROPERTY_AT_COPS_FALLBACK_AUTO    0 = not supported, 1 = supported. Does modem support mode 4 of AT+COPS= ?
+    6,   // PROPERTY_SOCKET_COUNT             The number of sockets of modem IP stack
+    1,   // PROPERTY_IP_TCP                   0 = not supported, 1 = supported. Modem IP stack has support for TCP
+    1,   // PROPERTY_IP_UDP                   0 = not supported, 1 = supported. Modem IP stack has support for TCP
+    100  // PROPERTY_AT_SEND_DELAY            Sending delay between AT commands in ms
 };
 
 SIMCOM_SIM800C::SIMCOM_SIM800C(FileHandle *fh, PinName pwr, bool active_high, PinName rst, PinName spl) 
@@ -122,10 +127,10 @@ nsapi_error_t SIMCOM_SIM800C::soft_power_off(){
 } 
 
 #if MBED_CONF_SIMCOM_SIM800C_PROVIDE_DEFAULT
-#include "UARTSerial.h"
+#include "drivers/BufferedSerial.h"
 CellularDevice *CellularDevice::get_default_instance()
 {
-    static UARTSerial serial(MBED_CONF_SIMCOM_SIM800C_TX, MBED_CONF_SIMCOM_SIM800C_RX, MBED_CONF_SIMCOM_SIM800C_BAUDRATE);
+    static BufferedSerial serial(MBED_CONF_SIMCOM_SIM800C_TX, MBED_CONF_SIMCOM_SIM800C_RX, MBED_CONF_SIMCOM_SIM800C_BAUDRATE);
 #if defined (MBED_CONF_SIMCOM_SIM800C_RTS) && defined(MBED_CONF_SIMCOM_SIM800C_CTS)
     tr_debug("SIMCOM_SIM800C flow control: RTS %d CTS %d", MBED_CONF_SIMCOM_SIM800C_RTS, MBED_CONF_SIMCOM_SIM800C_CTS);
     serial.set_flow_control(SerialBase::RTSCTS, MBED_CONF_SIMCOM_SIM800C_RTS, MBED_CONF_SIMCOM_SIM800C_CTS);
