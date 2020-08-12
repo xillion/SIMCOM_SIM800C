@@ -53,7 +53,7 @@ SIMCOM_SIM800C::SIMCOM_SIM800C(FileHandle *fh, PinName pwr, bool active_high, Pi
     _rst(rst, !_active_high),
     _supply(spl, !_active_high)
 {
-    AT_CellularBase::set_cellular_properties(cellular_properties);
+    set_cellular_properties(cellular_properties);
 }
 
 nsapi_error_t SIMCOM_SIM800C::hard_power_on(){
@@ -104,7 +104,7 @@ nsapi_error_t SIMCOM_SIM800C::soft_power_on(){
         tr_info("SIM800C::soft_power_on");
         if(status()!= NSAPI_ERROR_OK){
             tr_info("Power on modem");
-            press_button(_pwr, PWR_KEY_TIMING); // SIM800C_Hardware_Design_V1.05  requires time 600 ms, but 1000 ms seems to be more robust
+            press_button(_pwr, PWR_KEY_TIMING);
         }
 
     }
@@ -117,10 +117,9 @@ nsapi_error_t SIMCOM_SIM800C::soft_power_off(){
     {
         tr_info("SIM800C::soft_power_off");
         if(status() == NSAPI_ERROR_OK){
-            // SIM800C_Hardware_Design_V1.05  requires VBAT to be stable over 30 ms, that's handled above
             shutdown();
             tr_info("Power off modem");
-            press_button(_pwr, PWR_KEY_TIMING); // SIM800C_Hardware_Design_V1.05  requires time 600 ms, but 1000 ms seems to be more robust
+            press_button(_pwr, PWR_KEY_TIMING);
         }
     }
     return NSAPI_ERROR_UNSUPPORTED;
@@ -164,30 +163,4 @@ nsapi_error_t SIMCOM_SIM800C::status()
     _at->unlock();
     _at->sync(500);
     return err;
-
-    // modem is not responding, power it on
-    if (err != NSAPI_ERROR_OK) {
-        if (!reset) {
-            // SIM800C_Hardware_Design_V1.05  requires VBAT to be stable over 30 ms, that's handled above
-            tr_info("Power on modem");
-            press_button(_pwr, PWR_KEY_TIMING); // SIM800C_Hardware_Design_V1.05  requires time 600 ms, but 1000 ms seems to be more robust
-        } else {
-            tr_warn("Reset modem");
-            press_button(_rst, 150); // SIM800C_Hardware_Design_V1.05  requires RESET_N timeout at least 150 ms
-        }
-        _at->lock();
-        _at->set_at_timeout(6000);
-        _at->resp_start();
-        _at->set_stop_tag("RDY");
-        bool rdy = _at->consume_to_stop_tag();
-        _at->set_stop_tag(OK);
-        _at->restore_at_timeout();
-        _at->unlock();
-        if (!rdy) {
-            return false;
-        }
-    }
-
-    // sync to check that AT is really responsive and to clear garbage
-    return _at->sync(500);
 }

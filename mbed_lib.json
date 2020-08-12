@@ -29,6 +29,10 @@
             "help": "Reset pin.",
             "value": null
         },
+        "dtr": {
+            "help": "Data terminal ready pin.",
+            "value": null
+        },
         "baudrate" : {
             "help": "Serial connection baud rate",
             "value": 115200
