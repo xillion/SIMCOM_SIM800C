@@ -19,8 +19,12 @@
 #include "AT_CellularNetwork.h"
 #include "CellularLog.h"
 #include "rtos/ThisThread.h"
+#include "drivers/BufferedSerial.h"
 
+using namespace std::chrono;
 using namespace mbed;
+using namespace rtos;
+using namespace events;
 
 // by default all properties are supported
 static const intptr_t cellular_properties[AT_CellularDevice::PROPERTY_MAX] = {
@@ -104,7 +108,7 @@ nsapi_error_t SIMCOM_SIM800C::soft_power_on(){
         tr_info("SIM800C::soft_power_on");
         if(status()!= NSAPI_ERROR_OK){
             tr_info("Power on modem");
-            press_button(_pwr, PWR_KEY_TIMING);
+            press_button(_pwr, milliseconds(PWR_KEY_TIMING));
         }
 
     }
@@ -119,7 +123,7 @@ nsapi_error_t SIMCOM_SIM800C::soft_power_off(){
         if(status() == NSAPI_ERROR_OK){
             shutdown();
             tr_info("Power off modem");
-            press_button(_pwr, PWR_KEY_TIMING);
+            press_button(_pwr, milliseconds(PWR_KEY_TIMING));
         }
     }
     return NSAPI_ERROR_UNSUPPORTED;
@@ -139,7 +143,7 @@ CellularDevice *CellularDevice::get_default_instance()
 }
 #endif
 
-nsapi_error_t SIMCOM_SIM800C::press_button(DigitalOut &button, uint32_t timeout)
+nsapi_error_t SIMCOM_SIM800C::press_button(DigitalOut &button, duration<uint32_t, std::milli> timeout)
 {
     if (!button.is_connected()) {
         return NSAPI_ERROR_UNSUPPORTED;

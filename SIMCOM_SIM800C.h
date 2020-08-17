@@ -54,7 +54,7 @@ public:
     //virtual nsapi_error_t is_ready();
 
 private:
-    nsapi_error_t press_button(DigitalOut &button, uint32_t timeout);
+    nsapi_error_t press_button(DigitalOut &button, std::chrono::duration<uint32_t, std::milli> timeout);
     nsapi_error_t status();
     bool _active_high;
     DigitalOut _pwr; //power on/off key pin
