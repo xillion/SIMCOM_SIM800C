@@ -1,5 +1,5 @@
 {
-    "name": "SIMCOM_SIM800C",
+    "name": "SIMCOM_SIM800",
     "config": {
         "tx": {
             "help": "TX pin for serial connection. D1 assumed if Arduino Form Factor, needs to be set/overwritten otherwise.",
@@ -25,17 +25,17 @@
             "help": "DC-DC converter enable pin.",
             "value": null
         },
-        "rst": {
+        "reset": {
             "help": "Reset pin.",
             "value": null
         },
         "dtr": {
-            "help": "Data terminal ready pin.",
+            "help": "Data terminal ready pin. Usually not connected. It needs to be set/overwritten otherwise",
             "value": null
         },
         "baudrate" : {
             "help": "Serial connection baud rate",
-            "value": 115200
+            "value": 9600
         },
         "provide-default": {
             "help": "Provide as default CellularDevice [true/false]",
